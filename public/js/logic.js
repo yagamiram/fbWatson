@@ -149,7 +149,10 @@ $(document).ready(function () {
       scrollTo($loading);
 
       var lang = globalState.selectedSample == 'custom' ? globalState.selectedLanguage : $('input#text-'+ globalState.selectedSample).attr('data-lang');
+
       getProfileForText($('.input--text-area').val(), lang);
+      getPersonalityInsightsOfAUser($('.input--text-area').val());
+      getTaxonomyForUserInterests($('.input--text-area-myInterests').val());
     });
   }
 
@@ -256,6 +259,77 @@ $(document).ready(function () {
       url = '/api/profile/' + sourceType;
 
       postData.text = data;
+
+    $.ajax({
+      headers:{
+        'csrf-token': $('meta[name="ct"]').attr('content')
+      },
+      type: 'POST',
+      data: postData,
+      url: url,
+      dataType: 'json',
+      success: function(data) {
+        $loading.hide();
+        $output.show();
+        scrollTo($outputHeader);
+        loadOutput(data);
+      },
+      error: function(err) {
+        $loading.hide();
+        $error.show();
+        console.error(err);
+        $errorMessage.text(getErrorMessage(err));
+      }
+    });
+  }
+
+  function getPersonalityInsightsOfAUser(data) {
+
+    var postData = {
+        text: data
+      },
+
+      url = '/api/profile/personalityInsightsOfAUser';
+
+    $.ajax({
+      headers:{
+        'csrf-token': $('meta[name="ct"]').attr('content')
+      },
+      type: 'POST',
+      data: postData,
+      url: url,
+      dataType: 'json',
+      success: function(data) {
+        $loading.hide();
+        $output.show();
+        scrollTo($outputHeader);
+        loadOutput(data);
+      },
+      error: function(err) {
+        $loading.hide();
+        $error.show();
+        console.error(err);
+        $errorMessage.text(getErrorMessage(err));
+      }
+    });
+  }
+
+  function getTaxonomyForUserInterests(data) {
+    var result = JSON.parse(data)
+    var keywords = []
+    Object.keys(result).forEach(function(key) {
+        if (typeof(result[key]) == "object") {
+            var keyData = result[key]['data'];
+    		Object.keys(keyData).forEach(function(innerKey) {
+    			keywords.push(keyData[innerKey]['about']);
+    		 });
+        }
+    });
+    var postData = {
+        text: keywords
+      },
+
+    url = '/api/profile/TaxonomyForUserInterests';
 
     $.ajax({
       headers:{

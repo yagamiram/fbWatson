@@ -17,8 +17,6 @@
   <script>
     // This is called with the results from from FB.getLoginStatus().
     function statusChangeCallback(response) {
-      console.log('statusChangeCallback');
-      console.log(response);
       // The response object is returned with a status field that lets the
       // app know the current login status of the person.
       // Full docs on the response object can be found in the documentation
@@ -49,7 +47,7 @@
 
     window.fbAsyncInit = function() {
     FB.init({
-      appId      : '1659262794346941',
+      appId      : '1924484857799858',
       cookie     : true,  // enable cookies to allow the server to access
                           // the session
       xfbml      : true,  // parse social plugins on this page
@@ -86,8 +84,9 @@
     // Here we run a very simple test of the Graph API after login is
     // successful.  See statusChangeCallback() for when this call is made.
     function testAPI() {
-      console.log('Welcome!  Fetching your information.... ');
       getFBPosts();
+      getUserInterest();
+      getFriendsInterest();
       //only getting 274? back tho..
     }
     function getFBPosts() {
@@ -107,11 +106,46 @@
             posts+="\n "+post;
           }
           document.getElementById('inputText').value = posts.replace("undefined", "");
-          console.log("got posts: "+posts);
             // Insert your code here
         }
       );
     }
+
+    function getUserInterest() {
+      const userFieldSet = 'name, \
+      music.limit(10){name, about},\
+       movies.limit(10){name, about},\
+       books.limit(10){name, about},\
+       games.limit(10){name, about},\
+       television.limit(10){name, about}, \
+       likes.limit(10){name, about}';
+
+      FB.api(
+        '/me',
+        'GET',
+        {"fields":userFieldSet},
+        function(response) {
+            // Insert your code here
+            document.getElementById('myInterests').value = JSON.stringify(response, null, 2) ;
+        }
+      );
+
+            // Insert your code here
+        }
+
+        function getFriendsInterest() {
+          FB.api(
+            '/me',
+            'GET',
+            {"fields":"friends.limit(100){name,music.limit(10){name},books.limit(10){name},games.limit(10){name},movies.limit(10){name},likes.limit(10){name}}"},
+            function(response) {
+                // Insert your code here
+                document.getElementById('MyFriendsInterests').value = JSON.stringify(response, null, 2) ;
+            }
+          );
+
+                // Insert your code here
+            }
   </script>
 
 
@@ -151,6 +185,10 @@
           <div id="text-panel" class="tab-panels--tab-pane active" role="tab-panel">
             <form class="input--form2">
               <textarea id="inputText" class="base--textarea input--text-area" placeholder="Please enter text to analyze (minimum of 100 words)...">
+              </textarea>
+              <textarea id="myInterests" class="base--textarea input--text-area-myInterests" placeholder="Will be uploaded by FB">
+              </textarea>
+              <textarea id="MyFriendsInterests" class="base--textarea input--text-area-myFriendsInterests" placeholder="Will be uploaded by FB">
               </textarea>
               <div class="input--button-container">
                 <div id="languageChooser" class="input--language-chooser smartphone-hidden" style="display:none">
