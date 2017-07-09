@@ -154,6 +154,18 @@ app.post('/api/profile/TaxonomyForUserInterests', function(req, res, next) {
           }
         }
       }
+
+      if (resultant_videos.length < 12) {
+        var howManyVideosWereMissing = 12 - resultant_videos.length
+        var videoList = Object.keys(videos);
+        for(var i=0; i < howManyVideosWereMissing; i++) {
+            var rand = videoList[Math.floor(Math.random() * videoList.length)];
+            while (resultant_videos.includes(rand)) {
+              rand = videoList[Math.floor(Math.random() * videoList.length)];
+            }
+            resultant_videos.push(rand);
+        }
+      }
       console.log("the resultant_videos are", resultant_videos)
     });
 
